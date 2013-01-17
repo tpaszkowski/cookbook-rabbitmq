@@ -36,7 +36,7 @@ end
 action :set_permissions do
   if new_resource.vhost
     execute "rabbitmqctl set_permissions -p #{new_resource.vhost} #{new_resource.user} #{new_resource.permissions}" do
-      not_if "rabbitmqctl list_user_permissions | grep #{new_resource.user}"
+      not_if "rabbitmqctl list_user_permissions #{new_resource.user} | grep #{new_resource.vhost}"
       Chef::Log.info "Setting RabbitMQ user permissions for '#{new_resource.user}' on vhost #{new_resource.vhost}."
       new_resource.updated_by_last_action(true)
     end
@@ -52,7 +52,7 @@ end
 action :clear_permissions do
   if new_resource.vhost
     execute "rabbitmqctl clear_permissions -p #{new_resource.vhost} #{new_resource.user}" do
-      only_if "rabbitmqctl list_user_permissions | grep #{new_resource.user}"
+      only_if "rabbitmqctl list_user_permissions #{new_resource.user} | grep #{new_resource.vhost}"
       Chef::Log.info "Clearing RabbitMQ user permissions for '#{new_resource.user}' from vhost #{new_resource.vhost}."
       new_resource.updated_by_last_action(true)
     end
