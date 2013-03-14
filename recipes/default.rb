@@ -26,7 +26,7 @@ when "debian"
   # installs the required setsid command -- should be there by default but just in case
   package "util-linux"
 
-  if node['rabbitmq']['use_apt'] then
+  if node['rabbitmq']['use_package_resource'] then
     # use the RabbitMQ repository instead of Ubuntu or Debian's
     # because there are very useful features in the newer versions
 
@@ -57,7 +57,7 @@ when "debian"
 
 when "rhel", "fedora"
 
-  if node['rabbitmq']['use_yum'] then
+  if node['rabbitmq']['use_package_resource'] then
 
     package "rabbitmq-server"
 
@@ -69,6 +69,23 @@ when "rhel", "fedora"
     end
 
     rpm_package "#{Chef::Config[:file_cache_path]}/rabbitmq-server-#{node['rabbitmq']['version']}-1.noarch.rpm" do
+      action :install
+    end
+
+  end
+when "suse"
+  if node['rabbitmq']['use_package_resource'] then
+
+    package "rabbitmq-server"
+
+  else
+
+    remote_file "#{Chef::Config[:file_cache_path]}/rabbitmq-server-#{node['rabbitmq']['version']}-1.suse.noarch.rpm" do
+      source "https://www.rabbitmq.com/releases/rabbitmq-server/v#{node['rabbitmq']['version']}/rabbitmq-server-#{node['rabbitmq']['version']}-1.suse.noarch.rpm"
+      action :create_if_missing
+    end
+
+    rpm_package "#{Chef::Config[:file_cache_path]}/rabbitmq-server-#{node['rabbitmq']['version']}-1.suse.noarch.rpm" do
       action :install
     end
 
